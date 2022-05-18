@@ -28,8 +28,8 @@ If you have a GPX file from 14ers.com, AllTrails, or Gaia, you can use these lib
 
 ## How does it work?
 * given a GPX file...
-* convert the file to GeoJSON using this library from mapbox - https://github.com/mapbox/togeojson
-* then, convert the track points from the GeoJSON to track segments
+* the code will convert the file to GeoJSON using this library from mapbox - https://github.com/mapbox/togeojson
+* then, the code converts the track points from the GeoJSON to track segments
 
 For example, GPX files store points. We need to create geo features for each segment between the points so that the segements can be colorized separately based on their slope.
 
@@ -38,5 +38,5 @@ GPX Points:
 Segments between points:
 <p><img src="https://i.imgur.com/qEp3jRV.png" width="300" /></p>
 
-* then, for each segment, calculate the slope of the segment
-* finally, add the processed data to the Mapbox map and colorize by segment slope
+* then, for each segment, the code calculates the slope of the segment
+* finally, the code adds the processed data to the Mapbox map and colorizes each segment by the respective slope value
