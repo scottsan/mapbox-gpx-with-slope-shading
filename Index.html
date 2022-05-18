@@ -1,0 +1,196 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Add a line to a map using a GeoJSON source</title>
+    <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <script src='js/jquery.js'></script>
+    <script src='js/togeojson.js'></script>
+    <script src='js/geoJsonUtils.js'></script>
+    <script src='js/geoUtils.js'></script>
+    <script src='js/mapboxUtils.js'></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.js"></script>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+            z-index: -1;
+        }
+
+        #uploadForm {
+            width: 100%;
+            text-align: center;
+        }
+
+        #gpx-sample-file-links a {
+            display: block;
+            margin-top: 0.5rem;
+        }
+
+    </style>
+</head>
+<body>
+    <div id="uploadForm">
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#chooseGPXModal">
+            Choose GPX File
+        </button>
+    </div>
+    <div id="map"></div>
+    <div class="modal" id="chooseGPXModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Choose GPX File</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Choose a sample GPX file:</p>
+                    <div id="gpx-sample-file-links">
+                        <a href="gpx/holycross.gpx" data-bs-dismiss="modal">Mt. of the Holy Cross (14,005') - North Ridge</a>
+                        <a href="gpx/elbert.gpx" data-bs-dismiss="modal">Mt. Elbert (14,433') - Northeast Ridge</a>
+                        <a href="gpx/capitol.gpx" data-bs-dismiss="modal">Capitol Peak (14,130') - Northeast Ridge</a>
+                        <a href="gpx/wilson.gpx" data-bs-dismiss="modal">Wilson Peak (14,246') - Southwest Ridge</a>
+                        <a href="gpx/ranier.gpx" data-bs-dismiss="modal">Mt. Ranier (14,411')</a>
+                    </div>
+                    <p class="mt-4">Or, upload your own:</p>
+                    <p><input type="file" id="gpxFileUpload" data-bs-dismiss="modal"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script>
+
+        $(document).ready(function () {
+            $("#chooseGPXModal #gpx-sample-file-links a").click(function () {
+                loadGpxFromUrl(map, $(this).attr("href"));
+                return false;
+            })
+        });
+
+        document.getElementById('gpxFileUpload').addEventListener('change', function (e) {
+            handleFileSelect(e);
+
+        }, false);
+
+        mapboxgl.accessToken = 'pk.eyJ1IjoibWl0Y2hlbGx4IiwiYSI6ImNsMzRucWc2cDAwaWkzbHA5ZjF6YTB1b2cifQ.-ZHOTJY15FedqvH42WkwCg';
+
+        var defaultGpxFileUrl = 'gpx/holycross1.gpx';
+
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mitchellx/cl37syevj001514qnctrh8pql/draft',
+            center: [-106.479390, 39.4684732],
+            zoom: 13
+        });
+
+        map.on('load', () => {
+            loadGpxFromUrl(map, defaultGpxFileUrl);
+        });
+
+        function loadGpxFromUrl(map, gpxUrl) {
+            $.ajax({
+                url: gpxUrl,
+                dataType: 'xml'
+            }).done(function (xml) {
+                loadGpxFromXmlDocument(map, xml);
+            });
+        }
+        function loadGpxFromXmlString(map, xmlString) {
+            var xml = $.parseXML(xmlString)
+            loadGpxFromXmlDocument(map, xml);
+        }
+
+        function loadGpxFromXmlDocument(map, xml) {
+
+            var geoJson = toGeoJSON.gpx(xml);
+            var lineSegments = geoJsonUtils.toLineStrings(geoJson.features[0]);
+            var data = lineSegments;
+            console.log(data);
+
+            if (map.getLayer('track'))
+                map.removeLayer('track');
+
+            if (map.getSource('track'))
+                map.removeSource('track');
+
+            map.addSource('track', {
+                'type': 'geojson',
+                'data': data
+            });
+            map.addLayer({
+                'id': 'track',
+                'type': 'line',
+                'source': 'track',
+                'layout': {
+                    'line-join': 'round',
+                    'line-cap': 'round'
+                },
+                'paint': {
+                    'line-color': interpolatedTrackLineColorBasedOnSlopeAbsolute,
+                    'line-width': 8
+                }
+            });
+
+            var allCoordinates = [];
+            for (var i = 0; i < data.features.length; i++) {
+                allCoordinates = allCoordinates.concat(data.features[i].geometry.coordinates);
+            }
+            var bearing = geoUtils.getBearing(allCoordinates[0][1], allCoordinates[0][0], allCoordinates[allCoordinates.length - 1][1], allCoordinates[allCoordinates.length - 1][0])
+
+            mapboxUtils.zoomToCoordinatesBounds(map, allCoordinates, 0, bearing, 75);
+
+        }
+
+        function handleFileSelect(evt) {
+
+            let files = evt.target.files; // FileList object
+
+            // use the 1st file from the list
+            let f = files[0];
+
+            let reader = new FileReader();
+
+            // Closure to capture the file information.
+            reader.onload = (function (theFile) {
+                return function (e) {
+                    loadGpxFromXmlString(map, e.target.result);
+                    //jQuery('#ms_word_filtered_html').val(e.target.result);
+                };
+            })(f);
+
+            // Read in the image file as a data URL.
+            reader.readAsText(f);
+        }
+
+        var interpolatedTrackLineColorBasedOnSlopeAbsolute = [
+            'interpolate',
+            ['exponential', 1],
+            ['get', 'slopeAbsolute'],
+            0.05,
+            'hsl(109, 37%, 43%)',
+            0.15,
+            'hsl(64, 99%, 66%)',
+            0.25,
+            'hsl(41, 98%, 54%)',
+            0.35,
+            'hsl(4, 100%, 53%)',
+            0.45,
+            'hsl(287, 93%, 51%)'
+        ];
+
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM" crossorigin="anonymous"></script>
+</body>
+</html>
