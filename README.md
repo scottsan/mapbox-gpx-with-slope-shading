@@ -2,7 +2,8 @@
 
 This project demonstrates:
 * use of Mapbox GL JS
-* conversion of GPX points to GPX track segments
+* use of Mapbox Studio for creating a style with 3D layers, satellite layers, contour layers
+* conversion of GPX points to GPX track segments in javascript
 * display of GPX track segments on a Mapbox style, colorized by segment slope
 
 Some nifty features:
