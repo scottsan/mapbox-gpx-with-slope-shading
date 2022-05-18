@@ -7,7 +7,7 @@ This project demonstrates:
 
 Some nifty features:
 * automatic bearing detection to display the map according to the bearing of the GPX track
-* automatic zoom-to functionality for a GPX file
+* automatic zoom-to-bounds functionality for the features calculated from GPX file
 * ability to try one of the GPX samples, or upload your own GPX file
 * pure HTML, CSS, Javascript solution
 
