@@ -8,11 +8,11 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
     <script src="/lib/font-awesome/js/all.js"></script>
-    <script src='js/jquery.js'></script>
     <script src='js/togeojson.js'></script>
     <script src='js/geoJsonUtils.js'></script>
     <script src='js/geoUtils.js'></script>
     <script src='js/mapboxUtils.js'></script>
+    <script src='js/jquery.js'></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.js"></script>
     <style>
         body {
@@ -76,23 +76,8 @@
     </div>
     <script>
 
-        $(document).ready(function () {
-            // wire up an event to captures the user clicking a sample GPX file
-            $("#chooseGPXModal #gpx-sample-file-links a").click(function () {
-                // load the clicked file
-                loadGpxFromUrl(map, $(this).attr("href"));
-                // cancel the click since it's an anchor element and we don't want the user browser to nav to the href
-                return false;
-            })
-            // show the modal to allow the user to begin by selecting a GPX data source
-            $('#chooseGPXModal').modal('show');
-        });
-
-        // wire up an event to capture when the user uploads their own GPX file
-        document.getElementById('gpxFileUpload').addEventListener('change', function (e) {
-            // process the selected file
-            handleFileSelect(e);
-        }, false);
+        // set the default GPX file to load
+        var defaultGpxFileUrl = 'gpx/holycross.gpx';
 
         // set the mapbox token
         mapboxgl.accessToken = 'pk.eyJ1IjoibWl0Y2hlbGx4IiwiYSI6ImNsMzRucWc2cDAwaWkzbHA5ZjF6YTB1b2cifQ.-ZHOTJY15FedqvH42WkwCg';
@@ -104,12 +89,30 @@
             zoom: 13
         });
 
-        // set the default GPX file to load
-        var defaultGpxFileUrl = 'gpx/holycross.gpx';
-        // when the map loads, also load the default GPX file
-        map.on('load', () => {
-            loadGpxFromUrl(map, defaultGpxFileUrl);
+        $(window).on('load', function () {
+
+            // wire up an event to captures the user clicking a sample GPX file
+            $("#chooseGPXModal #gpx-sample-file-links a").click(function () {
+                // load the clicked file
+                loadGpxFromUrl(map, $(this).attr("href"));
+                // cancel the click since it's an anchor element and we don't want the user browser to nav to the href
+                return false;
+            })
+            // show the modal to allow the user to begin by selecting a GPX data source
+            $('#chooseGPXModal').modal('show');
+
+            // when the map loads, also load the default GPX file
+            map.on('load', () => {
+                loadGpxFromUrl(map, defaultGpxFileUrl);
+            });
+
         });
+
+        // wire up an event to capture when the user uploads their own GPX file
+        document.getElementById('gpxFileUpload').addEventListener('change', function (e) {
+            // process the selected file
+            handleFileSelect(e);
+        }, false);
 
         // utility function to load GPX from a URL onto the map
         function loadGpxFromUrl(map, gpxUrl) {

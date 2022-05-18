@@ -31,8 +31,8 @@
 
                 // [meters] calculate the elevation gain (or loss) for this segment
                 var gain = coords[elevation] - priorCoords[elevation];
-                // calculate the distance of this segment between its two points
-                var [meters] distance = geoUtils.getDistanceFromLatLonInMeters(coords[lat], coords[lon], priorCoords[lat], priorCoords[lon]);
+                // [meters] calculate the distance of this segment between its two points
+                var distance = geoUtils.getDistanceFromLatLonInMeters(coords[lat], coords[lon], priorCoords[lat], priorCoords[lon]);
                 // calculate the slope of the segment based on the gain and distance
                 var slope = gain / distance;
 
