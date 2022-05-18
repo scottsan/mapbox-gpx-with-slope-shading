@@ -15,6 +15,7 @@ Libraries:
 * Mapbox GL JS, and Mapbox togeojson
 * Bootstrap
 * jQuery
+* Font Awesome
 
 ## What's the purpose?
 When hiking a mountain, such as a Colorado 14er, it's interesting to see the steepness, or slope, of the hike at any given section. If you have a GPX file from 14ers.com, AllTrails, or Gaia, you can use these libraries to process the GPX data into trail segments enriched with slope values, and visualize the slope for each section of the hike.
