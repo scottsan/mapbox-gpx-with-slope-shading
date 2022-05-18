@@ -13,6 +13,7 @@
     <script src='js/geoUtils.js'></script>
     <script src='js/mapboxUtils.js'></script>
     <script src='js/jquery.js'></script>
+    <script src='js/config.js'></script>
     <script src="https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.js"></script>
     <style>
         body {
@@ -80,11 +81,11 @@
         var defaultGpxFileUrl = 'gpx/holycross.gpx';
 
         // set the mapbox token
-        mapboxgl.accessToken = 'pk.eyJ1IjoibWl0Y2hlbGx4IiwiYSI6ImNsMzRucWc2cDAwaWkzbHA5ZjF6YTB1b2cifQ.-ZHOTJY15FedqvH42WkwCg';
+        mapboxgl.accessToken = config.mapboxAccessToken;
         // initialize the map with the 14er style
         const map = new mapboxgl.Map({
             container: 'map',
-            style: 'mapbox://styles/mitchellx/cl37syevj001514qnctrh8pql/draft',
+            style: config.mapboxMapStyleUrl,
             center: [-106.479390, 39.4684732],
             zoom: 13
         });
