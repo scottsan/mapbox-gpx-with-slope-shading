@@ -1,6 +1,7 @@
 # mapbox-gpx-with-slope-shading
 
 This project demonstrates:
+* creating data from data (in this case, creating GPX track segment slope data from GPX track points)
 * use of Mapbox GL JS
 * use of Mapbox Studio for creating a style with 3D layers, satellite layers, contour layers
 * conversion of GPX points to GPX track segments in javascript
