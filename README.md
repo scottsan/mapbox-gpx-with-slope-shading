@@ -1,5 +1,8 @@
 # mapbox-gpx-with-slope-shading
 
+To run this code:
+* modify values in js/config.js to match your Mapbox access token and your preferred Mapbox studio style url
+
 This project demonstrates:
 * creating data from data (in this case, creating GPX track segment slope data from GPX track points)
 * use of Mapbox GL JS
