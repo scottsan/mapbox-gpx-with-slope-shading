@@ -18,7 +18,11 @@ Libraries:
 * Font Awesome
 
 ## What's the purpose?
-When hiking a mountain, such as a Colorado 14er, it's interesting to see the steepness, or slope, of the hike at any given section. If you have a GPX file from 14ers.com, AllTrails, or Gaia, you can use these libraries to process the GPX data into trail segments enriched with slope values, and visualize the slope for each section of the hike.
+When hiking a mountain, such as a Colorado 14er, it's interesting to see the steepness, or slope, of the hike at any given section. 
+
+Currently, I don't know of a site or app that does this, so I coded it.
+
+If you have a GPX file from 14ers.com, AllTrails, or Gaia, you can use these libraries to process the GPX data into trail segments enriched with slope values, and visualize the slope for each section of the hike.
 
 ## How does it work?
 * given a GPX file...
