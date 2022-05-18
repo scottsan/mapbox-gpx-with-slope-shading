@@ -3,10 +3,10 @@
     var t = {
 
         get mapboxMapStyleUrl() {
-            return 'mapbox://styles/mitchellx/cl37syevj001514qnctrh8pql/draft';
+            return 'YOUR_MAPBOX_STYLE_URL_HERE';
         },
         get mapboxAccessToken() {
-            return 'pk.eyJ1IjoibWl0Y2hlbGx4IiwiYSI6ImNsMzRucWc2cDAwaWkzbHA5ZjF6YTB1b2cifQ.-ZHOTJY15FedqvH42WkwCg';
+            return 'YOUR_MAPBOX_ACCESS_TOKEN_HERE';
         }
         
     }
