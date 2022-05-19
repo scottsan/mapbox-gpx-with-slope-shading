@@ -29,7 +29,7 @@
             z-index: -1;
         }
 
-        #uploadForm {
+        #headerButtons {
             width: 100%;
             text-align: center;
         }
@@ -41,7 +41,7 @@
     </style>
 </head>
 <body>
-    <div id="uploadForm">
+    <div id="headerButtons">
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#chooseGPXModal">
             Choose GPX File
         </button>
@@ -75,22 +75,54 @@
             </div>
         </div>
     </div>
+    <div class="modal" id="mapboxLoadErrorModal" tabindex="-1" data-backdrop="static" data-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Mapbox Error</h5>
+                </div>
+                <div class="modal-body">
+                    <p>An error occurred within the Mapbox component.</p>
+                    <p>A proper Mapbox <strong>Access Token</strong> and <strong>Style Url</strong> are required.</p>
+                    <p>Please update these in the js/config.js file.</p>
+                    <p><a href="https://docs.mapbox.com/help/glossary/access-token/">Click here for your Mapbox Access Token</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
     <script>
 
         // set the default GPX file to load
         var defaultGpxFileUrl = 'gpx/holycross.gpx';
 
-        // set the mapbox token
-        mapboxgl.accessToken = config.mapboxAccessToken;
-        // initialize the map with the 14er style
-        const map = new mapboxgl.Map({
-            container: 'map',
-            style: config.mapboxMapStyleUrl,
-            center: [-106.479390, 39.4684732],
-            zoom: 13
-        });
-
         $(window).on('load', function () {
+
+            // set the mapbox token
+            mapboxgl.accessToken = config.mapboxAccessToken;
+
+            // initialize the map with the configured style
+            const map = new mapboxgl.Map({
+                container: 'map',
+                style: config.mapboxMapStyleUrl,
+                center: config.defaultMapCenterpoint,
+                zoom: config.defaultMapZoom
+            });
+
+            // handle map load errors by showing a modal
+            map.on('error', (e) => {
+                // hide the header buttons
+                $("#headerButtons").hide();
+                // config the modal so that it can't be closed
+                $('#mapboxLoadErrorModal').modal({ backdrop: 'static', keyboard: false });
+                // show the error modal info window and hide any other modals that might be displayed
+                $("div.modal").hide();
+                $('#mapboxLoadErrorModal').modal('show');
+            });
+
+            // when the map loads, also load the default GPX file
+            map.on('load', () => {
+                loadGpxFromUrl(map, defaultGpxFileUrl);
+            });
 
             // wire up an event to captures the user clicking a sample GPX file
             $("#chooseGPXModal #gpx-sample-file-links a").click(function () {
@@ -99,21 +131,17 @@
                 // cancel the click since it's an anchor element and we don't want the user browser to nav to the href
                 return false;
             })
+            
+            // wire up an event to capture when the user uploads their own GPX file
+            document.getElementById('gpxFileUpload').addEventListener('change', function (e) {
+                // process the selected file
+                handleFileSelect(e, map);
+            }, false);
+
             // show the modal to allow the user to begin by selecting a GPX data source
             $('#chooseGPXModal').modal('show');
 
-            // when the map loads, also load the default GPX file
-            map.on('load', () => {
-                loadGpxFromUrl(map, defaultGpxFileUrl);
-            });
-
         });
-
-        // wire up an event to capture when the user uploads their own GPX file
-        document.getElementById('gpxFileUpload').addEventListener('change', function (e) {
-            // process the selected file
-            handleFileSelect(e);
-        }, false);
 
         // utility function to load GPX from a URL onto the map
         function loadGpxFromUrl(map, gpxUrl) {
@@ -146,7 +174,7 @@
             if (map.getSource('track'))
                 map.removeSource('track');
 
-            // add the data to the map, using a painting scheme 
+            // add the data to the map, using a painting scheme
             // that colorizes the segments based on slope
             map.addSource('track', {
                 'type': 'geojson',
@@ -172,7 +200,7 @@
             for (var i = 0; i < data.features.length; i++) {
                 allCoordinates = allCoordinates.concat(data.features[i].geometry.coordinates);
             }
-            // calculate the bearing of the data based on the direction from the 
+            // calculate the bearing of the data based on the direction from the
             // first coord in the data to the last
             var bearing = geoUtils.getBearing(allCoordinates[0][1], allCoordinates[0][0], allCoordinates[allCoordinates.length - 1][1], allCoordinates[allCoordinates.length - 1][0])
 
@@ -181,7 +209,7 @@
 
         }
 
-        function handleFileSelect(evt) {
+        function handleFileSelect(evt, map) {
 
             let files = evt.target.files; // FileList object
 
