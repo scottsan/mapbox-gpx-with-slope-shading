@@ -1,14 +1,14 @@
 # mapbox-gpx-with-slope-shading
 
-To run this code:
-* modify values in js/config.js to match your Mapbox access token and your preferred Mapbox studio style url
-
 This project demonstrates:
 * creating data from data (in this case, creating GPX track segment slope data from GPX track points)
 * use of Mapbox GL JS
 * use of Mapbox Studio for creating a style with 3D layers, satellite layers, contour layers
 * conversion of GPX points to GPX track segments in javascript
 * display of GPX track segments on a Mapbox style, colorized by segment slope
+
+To run this code:
+* modify values in js/config.js to match your Mapbox access token and your preferred Mapbox studio style url
 
 Some nifty features:
 * automatic bearing detection to display the map according to the bearing of the GPX track
